@@ -1,17 +1,28 @@
 [tool.poetry]
-name = "pythonprojecttemplate"
+name = "rosa-task-scheduler"
 version = "0.1.0"
-description = "template python project"
-authors = ["Robert Piwowarek <rpw@touk.pl>"]
+description = "Task Scheduler for ROSA system"
+authors = ["Wojciech Gruszka <wojciech@gruszka.eu>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
 requests = "^2.23.0"
-pytest = "^5.4.1"
-nox = "^2019.11.9"
+flask = "^1.1.2"
+flask_restful = "^0.3.8"
+flask-jwt-extended = "^3.24.1"
+bcrypt = "^3.1.7"
+pika = "^1.1.0"
+celery = "^4.4.5"
+cryptography = "^2.9.2"
+rosatasks = {git = "https://github.com/RSOA-WEITI-2020/ROSATasks"}
+flask_sqlalchemy = "^2.4.3"
+pymysql = "^0.9.3"
 
 [tool.poetry.dev-dependencies]
+autopep8 = "^1.5.2"
+pytest = "^5.4.1"
+nox = "^2019.11.9"
 
 [build-system]
 requires = ["poetry>=0.12"]

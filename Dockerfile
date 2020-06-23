@@ -1,13 +1,9 @@
-FROM python:3
+FROM tiangolo/uwsgi-nginx-flask:python3.8
 
-ENV WORKSPACE="/rosa/app/source/"
-
-ADD *.py ${WORKSPACE}
-ADD pyproject.toml ${WORKSPACE}
+ADD pyproject.toml /
 
 RUN pip3 install poetry
-RUN cd ${WORKSPACE} && poetry install
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev
 
-WORKDIR ${WORKSPACE}
-
-CMD ["python", "example.py"]
+COPY ./app /app

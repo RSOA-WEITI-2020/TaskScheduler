@@ -1,7 +1,7 @@
 import nox
 
 
-@nox.session
+@nox.session(python=False)
 def tests(session):
-    session.install('pytest')
-    session.run('pytest')
+    session.run('poetry', 'install')
+    session.run('poetry', 'run', 'pytest')
