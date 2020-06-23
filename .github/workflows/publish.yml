@@ -11,12 +11,13 @@ jobs:
       - uses: actions/checkout@master
       - name: Set release version
         run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
-      - name: Login, build and push
-        env:
-          CONTAINER_IMAGE: docker.pkg.github.com/${{github.repository}}/template_app:${{ env.RELEASE_VERSION }}
-        run: |
-          export CONTAINER_LOWERCASE="${CONTAINER_IMAGE,,}"
-          echo $CONTAINER_LOWERCASE
-          docker login -u $GITHUB_ACTOR -p ${{secrets.GITHUB_TOKEN}} docker.pkg.github.com
-          docker build -t $CONTAINER_LOWERCASE .
-          docker push $CONTAINER_LOWERCASE
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1.1.0
+        with:
+          # Username used to log in to a Docker registry. If not set then no login will occur
+          username: ${{ secrets.USR }} # optional
+          # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+          password: ${{ secrets.PSW }} # optional
+          repository: rpwtouk/rosaexecutor
+          # Automatically tags the built image with the git reference as per the readme
+          tag_with_ref: true # optional
