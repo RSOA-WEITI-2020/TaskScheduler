@@ -28,6 +28,7 @@ from model import (
 )
 
 from tasks import queue_simulation
+from celery.result import AsyncResult
 
 
 class BaseResource(Resource):
@@ -73,8 +74,16 @@ class Tasks(BaseResource):
         except:
             abort(500)
 
-        queue_simulation(task.id)
-        return {'message': 'ok'}
+        celery_task_id = queue_simulation(task.id)
+        task.celery_task_id = celery_task_id
+
+        try:
+            db.session.add(task)
+            db.session.commit()
+        except:
+            abort(500)
+
+        return {'message': 'ok', 'celery_task_id': celery_task_id}
 
 
 class Task(BaseResource):
@@ -89,32 +98,26 @@ class Task(BaseResource):
         if task is None:
             return
 
-        return json.dumps(c, cls=AlchemyEncoder)
+        return json.dumps(task, cls=AlchemyEncoder)
 
-# class TaskStatus(BaseResource):
-#     path = "/v1/task/<int:id>/status"
 
-#     def __init__(self):
-#         pass
+class TaskStatus(BaseResource):
+    path = "/v1/task/<int:id>/status"
 
-#     @jwt_required
-#     def get(self, id):
-#         data = self.parser.parse_args()
-#         username = data['username']
-#         password = data['password']
-#         email = data['email']
-#         password_hash = bcrypt.hashpw(
-#             password.encode('utf-8'), bcrypt.gensalt()).hex()
-#         user = User(
-#             username=username,
-#             password_hash=password_hash,
-#             email=email,
-#         )
+    def __init__(self):
+        pass
 
-#         try:
-#             db.session.add(user)
-#             db.session.commit()
-#         except:
-#             abort(409)
+    @jwt_required
+    def get(self, id):
+        task = Task.query.filter_by(id=id).first()
+        if task is None:
+            abort(500)
 
-#         return {'message': 'ok'}
+        celery_task_id = task.celery_task_id
+
+        task = AsyncResult(celery_task_id)
+        data = {
+            'state': task.state,
+            'result': task.result,
+        }
+        return json.dumps(data)

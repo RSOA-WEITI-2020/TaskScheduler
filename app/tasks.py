@@ -23,8 +23,9 @@ def queue_simulation(task_id):
         immutable=True,
         options={"queue": "qiskit_queue"}
     )
+
     celery.chain(routed_task, write_result.s(task_id))()
-    logger.info("Task %s queued", task)
+    return routed_task.id
 
 
 @celery.shared_task(ignore_result=True)
