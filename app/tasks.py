@@ -1,14 +1,13 @@
 import celery
 import json
+import threading
+import time
 from rosatasks.quantum_sim_tasks import simulate_code
 from models import Task, TaskStatusEnum
 from extensions import db
 
-logger = celery.utils.log.get_task_logger(__name__)
 
-
-def queue_simulation(task_id):
-    print("xD")
+def queue_simulation(task_id, app):
     task = Task.query.filter_by(id=task_id).first()
     if task is None:
         print(f"Cannot queue task of ID {task_id}")
@@ -20,27 +19,39 @@ def queue_simulation(task_id):
 
     routed_task = simulate_code.s(task_id, code, shots)
     result = routed_task.delay()
-    print("started task")
-    result.wait()
-    print(result.result)
+    TaskThread(result, app).start()
 
-    task = Task.query.filter_by(id=task_id).first()
-    if task is None:
-        return
-    logger.info("asd")
-    logger.info(result)
-    task_id, err, res, schema = result.result
-    if err != None:
-        task.status = TaskStatusEnum.error
-        task.response = json.dumps({'error': err})
-    else:
-        task.status = TaskStatusEnum.done
-        task.response = json.dumps(result)
 
-    try:
-        db.session.add(task)
-        db.session.commit()
-    except:
-        logger.error("Cannot save results into DB")
+class TaskThread(threading.Thread):
+    def __init__(self, async_result, app):
+        threading.Thread.__init__(self)
+        self.result = async_result
+        self.app = app
 
-    return routed_task.id
+    def run(self):
+        print("started task thread")
+        print(self.result)
+        while not self.result.ready():
+            print(self.result.status, flush=True)
+            time.sleep(1)
+
+        print(self.result.result, flush=True)
+
+        task_id, err, res, schema = self.result.result
+        with self.app.app_context():
+            task = Task.query.filter_by(id=task_id).first()
+            if task is None:
+                return
+
+        if err != None:
+            task.status = TaskStatusEnum.error
+            task.response = {'error': err}
+        else:
+            task.status = TaskStatusEnum.done
+            task.response = res
+        with self.app.app_context():
+            try:
+                db.session.add(task)
+                db.session.commit()
+            except:
+                print("Cannot save results into DB")

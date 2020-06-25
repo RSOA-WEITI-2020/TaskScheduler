@@ -75,7 +75,7 @@ class Tasks(BaseResource):
         except:
             abort(500)
 
-        celery_task_id = queue_simulation(task.id)
+        celery_task_id = queue_simulation(task.id, db.get_app())
         task.celery_task_id = celery_task_id
 
         try:
@@ -93,13 +93,13 @@ class SingleTask(BaseResource):
     def __init__(self):
         pass
 
-    @jwt_required
+#   @jwt_required
     def get(self, id):
         task = Task.query.filter_by(id=id).first()
         if task is None:
             return
 
-        return json.dumps(task, cls=AlchemyEncoder)
+        return json.loads(json.dumps(task, cls=AlchemyEncoder))
 
 
 class TaskStatus(BaseResource):
@@ -108,7 +108,7 @@ class TaskStatus(BaseResource):
     def __init__(self):
         pass
 
-    @jwt_required
+#    @jwt_required
     def get(self, id):
         task = Task.query.filter_by(id=id).first()
         if task is None:

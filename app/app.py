@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from app_celery import *
-from tasks import *
+
 
 def create_app(db_uri, keys_dir_path):
     app = Flask(__name__)
