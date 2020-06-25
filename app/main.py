@@ -2,8 +2,7 @@ import os
 from app import create_app
 
 app_dir = os.path.dirname(os.path.realpath(__file__))
-db_uri = 'sqlite:///' + app_dir + '/test.db'
-# db_uri = 'mysql+pymysql://root:password@user_database/task_db'
+db_uri = 'mysql+pymysql://root:password@taskdb/task_db'
 
 app = create_app(db_uri, app_dir + '/../keys')
 
