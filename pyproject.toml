@@ -10,13 +10,13 @@ python = "^3.7"
 requests = "^2.23.0"
 flask = "^1.1.2"
 flask_restful = "^0.3.8"
+flask_sqlalchemy = "^2.4.3"
 flask-jwt-extended = "^3.24.1"
 bcrypt = "^3.1.7"
 pika = "^1.1.0"
 celery = "^4.4.5"
 cryptography = "^2.9.2"
 rosatasks = {git = "https://github.com/RSOA-WEITI-2020/ROSATasks"}
-flask_sqlalchemy = "^2.4.3"
 pymysql = "^0.9.3"
 
 [tool.poetry.dev-dependencies]

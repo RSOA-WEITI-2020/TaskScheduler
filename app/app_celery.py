@@ -1,3 +1,5 @@
+from tasks import *
+from rosatasks.quantum_sim_tasks import simulate_code
 import os
 import celery
 
@@ -6,13 +8,14 @@ password = os.environ["BROKER_PASSWORD"]
 address = os.environ["BROKER_ADDRESS"]
 broker_address = f"amqp://{user}:{password}@{address}"
 
-app = celery.Celery('rosascheduler')
+app_celery = celery.Celery('rosascheduler', broker=broker_address, backend=broker_address)
 
-app.conf.update(
-
+app_celery.conf.update(
     task_serializer='json',
     accept_content=['json'],
     result_serializer='json',
 )
-app.config_from_object()
-app.autodiscover_tasks()
+app_celery.set_default()
+app_celery.autodiscover_tasks()
+
+print(app_celery.tasks)

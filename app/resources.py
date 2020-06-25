@@ -22,7 +22,7 @@ from extensions import (
     AlchemyEncoder
 )
 
-from model import (
+from models import (
     Task,
     TaskStatusEnum
 )
@@ -54,10 +54,11 @@ class Tasks(BaseResource):
         self.parser.add_argument(
             'shots', help='This field cannot be blank', required=True)
 
-    @jwt_required
+    # @jwt_required
     def post(self):
         data = self.parser.parse_args()
         user_id = get_jwt_identity()
+        user_id = 0
         code = data['code']
         shots = data['shots']
 
@@ -65,7 +66,7 @@ class Tasks(BaseResource):
             user_id=user_id,
             code=code,
             shots=shots,
-            status=model.TaskStatusEnum.pending
+            status=TaskStatusEnum.pending
         )
 
         try:
@@ -86,7 +87,7 @@ class Tasks(BaseResource):
         return {'message': 'ok', 'celery_task_id': celery_task_id}
 
 
-class Task(BaseResource):
+class SingleTask(BaseResource):
     path = "/v1/task/<int:id>"
 
     def __init__(self):

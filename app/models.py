@@ -12,7 +12,7 @@ class TaskStatusEnum(enum.Enum):
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    celery_task_id = db.Column(db.Integer, nullable=False)
+    celery_task_id = db.Column(db.Integer, nullable=True)
     user_id = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.DateTime(), nullable=True)
     end_time = db.Column(db.DateTime(), nullable=True)
