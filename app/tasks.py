@@ -21,7 +21,8 @@ def queue_simulation(task_id, app):
 
     routed_task = simulate_code.s(task_id, code, shots)
     result = routed_task.delay()
-    TaskThread(result, app).start()
+    thread = TaskThread(result, app)
+    thread.start()
 
 
 class TaskThread(threading.Thread):
@@ -36,7 +37,6 @@ class TaskThread(threading.Thread):
         while not self.result.ready():
             print(self.result.status, flush=True)
             time.sleep(1)
-
         print(self.result.result, flush=True)
 
         task_id, err, res, schema, seconds = self.result.result

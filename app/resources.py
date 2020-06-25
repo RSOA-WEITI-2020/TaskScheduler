@@ -76,8 +76,7 @@ class Tasks(BaseResource):
         except:
             abort(500)
 
-        celery_task_id = queue_simulation(task.id, db.get_app())
-        task.celery_task_id = celery_task_id
+        queue_simulation(task.id, db.get_app())
 
         try:
             db.session.add(task)
