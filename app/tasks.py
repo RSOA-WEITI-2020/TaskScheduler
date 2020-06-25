@@ -5,6 +5,7 @@ import time
 from rosatasks.quantum_sim_tasks import simulate_code
 from models import Task, TaskStatusEnum
 from extensions import db
+from datetime import datetime
 
 
 def queue_simulation(task_id, app):
@@ -37,18 +38,22 @@ class TaskThread(threading.Thread):
 
         print(self.result.result, flush=True)
 
-        task_id, err, res, schema = self.result.result
+        task_id, err, res, schema, seconds = self.result.result
         with self.app.app_context():
             task = Task.query.filter_by(id=task_id).first()
             if task is None:
                 return
 
         if err != None:
-            task.status = TaskStatusEnum.error
+            task.status = TaskStatusEnum.ERROR
             task.response = {'error': err}
         else:
-            task.status = TaskStatusEnum.done
+            task.status = TaskStatusEnum.DONE
             task.response = res
+
+        task.end_time = datetime.now()
+        task.cost = seconds * 0.10  # 10 gr per second
+
         with self.app.app_context():
             try:
                 db.session.add(task)

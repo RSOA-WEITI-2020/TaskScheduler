@@ -4,10 +4,10 @@ import enum
 
 
 class TaskStatusEnum(enum.Enum):
-    pending = "PENDING"
-    in_progress = "IN PROGRESS"
-    done = "DONE"
-    error = "ERROR"
+    PENDING = 1
+    IN_PROGRESS = 2
+    DONE = 3
+    ERROR = 4
 
 
 class Task(db.Model):

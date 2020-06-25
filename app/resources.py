@@ -29,6 +29,7 @@ from models import (
 
 from tasks import queue_simulation
 from celery.result import AsyncResult
+from datetime import datetime
 
 
 class BaseResource(Resource):
@@ -54,11 +55,10 @@ class Tasks(BaseResource):
         self.parser.add_argument(
             'shots', help='This field cannot be blank', required=True)
 
-    # @jwt_required
+    @jwt_required
     def post(self):
         data = self.parser.parse_args()
         user_id = get_jwt_identity()
-        user_id = 0
         code = data['code']
         shots = data['shots']
 
@@ -66,7 +66,8 @@ class Tasks(BaseResource):
             user_id=user_id,
             code=code,
             shots=shots,
-            status=TaskStatusEnum.pending
+            status=TaskStatusEnum.PENDING,
+            start_time=datetime.now()
         )
 
         try:
@@ -84,41 +85,76 @@ class Tasks(BaseResource):
         except:
             abort(500)
 
-        return {'message': 'ok', 'celery_task_id': celery_task_id}
+        return {'message': 'ok', 'task_id': task.id}
+
+    @jwt_required
+    def get(self):
+        user_id = get_jwt_identity()
+
+        tasks = Task.query.filter_by(user_id=user_id).all()
+        res = []
+        for task in tasks:
+            start_str = None
+            end_str = None
+
+            try:
+                start_str = task.start_time.strftime("%d-%m-%YT%H:%M:%S")
+            except:
+                pass
+
+            try:
+                end_str = task.end_time.strftime("%d-%m-%YT%H:%M:%S")
+            except:
+                pass
+
+            res.append({'id': task.id,
+                        'user_id': task.user_id,
+                        'start_time': start_str,
+                        'end_time': end_str,
+                        'code': task.code,
+                        'shots': task.shots,
+                        'status': task.status.name,
+                        'response': task.response,
+                        'cost': task.cost
+                        })
+
+        return res
 
 
 class SingleTask(BaseResource):
-    path = "/v1/task/<int:id>"
+    path = "/v1/task/<int:task_id>"
 
     def __init__(self):
         pass
 
-#   @jwt_required
-    def get(self, id):
-        task = Task.query.filter_by(id=id).first()
+    @jwt_required
+    def get(self, task_id):
+        user_id = get_jwt_identity()
+
+        task = Task.query.filter_by(id=task_id, user_id=user_id).first()
         if task is None:
             return
 
-        return json.loads(json.dumps(task, cls=AlchemyEncoder))
+        start_str = None
+        end_str = None
 
+        try:
+            start_str = task.start_time.strftime("%d-%m-%YT%H:%M:%S")
+        except:
+            pass
 
-class TaskStatus(BaseResource):
-    path = "/v1/task/<int:id>/status"
+        try:
+            end_str = task.end_time.strftime("%d-%m-%YT%H:%M:%S")
+        except:
+            pass
 
-    def __init__(self):
-        pass
-
-#    @jwt_required
-    def get(self, id):
-        task = Task.query.filter_by(id=id).first()
-        if task is None:
-            abort(500)
-
-        celery_task_id = task.celery_task_id
-
-        task = AsyncResult(celery_task_id)
-        data = {
-            'state': task.state,
-            'result': task.result,
-        }
-        return json.dumps(data)
+        return {'id': task.id,
+                'user_id': task.user_id,
+                'start_time': start_str,
+                'end_time': end_str,
+                'code': task.code,
+                'shots': task.shots,
+                'status': task.status.name,
+                'response': task.response,
+                'cost': task.cost
+                }
