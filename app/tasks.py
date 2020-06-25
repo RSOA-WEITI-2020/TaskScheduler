@@ -52,6 +52,7 @@ class TaskThread(threading.Thread):
             else:
                 task.status = TaskStatusEnum.DONE
                 task.response = res
+                task.schema = schema
 
             task.end_time = datetime.now()
             task.cost = seconds * 0.10  # 10 gr per second

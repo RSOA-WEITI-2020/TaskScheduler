@@ -117,7 +117,8 @@ class Tasks(BaseResource):
                         'shots': task.shots,
                         'status': task.status.name,
                         'response': task.response,
-                        'cost': cost
+                        'cost': cost,
+                        'schema': task.schema
                         })
 
         return res
@@ -161,5 +162,6 @@ class SingleTask(BaseResource):
                 'shots': task.shots,
                 'status': task.status.name,
                 'response': task.response,
-                'cost': cost
+                'cost': cost,
+                'schema': task.schema
                 }

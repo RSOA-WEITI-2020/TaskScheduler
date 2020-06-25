@@ -17,6 +17,7 @@ class Task(db.Model):
     end_time = db.Column(db.DateTime(), nullable=True)
     code = db.Column(db.Text(), nullable=False)
     shots = db.Column(db.Integer, nullable=False)
+    schema = db.Column(db.Text(), nullable=True)
     status = db.Column(db.Enum(TaskStatusEnum), nullable=False)
     response = db.Column(db.JSON(), nullable=True)
     cost = db.Column(DECIMAL(precision=6, scale=2,
