@@ -3,9 +3,10 @@ import json
 import threading
 import time
 from rosatasks.quantum_sim_tasks import simulate_code
-from models import Task, TaskStatusEnum
+from models import Task, TaskStatusEnum, User
 from extensions import db
 from datetime import datetime
+from decimal import *
 
 
 def queue_simulation(task_id, app):
@@ -39,24 +40,38 @@ class TaskThread(threading.Thread):
         print(self.result.result, flush=True)
 
         task_id, err, res, schema, seconds = self.result.result
+        user_id = None
         with self.app.app_context():
             task = Task.query.filter_by(id=task_id).first()
             if task is None:
                 return
 
-        if err != None:
-            task.status = TaskStatusEnum.ERROR
-            task.response = {'error': err}
-        else:
-            task.status = TaskStatusEnum.DONE
-            task.response = res
+            if err != None:
+                task.status = TaskStatusEnum.ERROR
+                task.response = {'error': err}
+            else:
+                task.status = TaskStatusEnum.DONE
+                task.response = res
 
-        task.end_time = datetime.now()
-        task.cost = seconds * 0.10  # 10 gr per second
-
-        with self.app.app_context():
+            task.end_time = datetime.now()
+            task.cost = seconds * 0.10  # 10 gr per second
+            user_id = task.user_id
             try:
                 db.session.add(task)
                 db.session.commit()
             except:
                 print("Cannot save results into DB")
+
+        with self.app.app_context():
+            user = User.query.filter_by(id=user_id).first()
+            if user is None:
+                return
+
+        user.balance = Decimal(float(user.balance) - float(task.cost))
+
+        with self.app.app_context():
+            try:
+                db.session.add(user)
+                db.session.commit()
+            except:
+                print("Cannot update wallet")

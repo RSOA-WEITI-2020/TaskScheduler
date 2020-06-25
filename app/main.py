@@ -3,8 +3,11 @@ from app import create_app
 
 app_dir = os.path.dirname(os.path.realpath(__file__))
 db_uri = 'mysql+pymysql://root:password@taskdb/task_db'
+users_db_uri = 'mysql+pymysql://root:password@userdb/user_db'
+# db_uri = 'sqlite:///' + app_dir + '/test.db'
+# users_db_uri = 'sqlite:///' + app_dir + '/user.db'
 
-app = create_app(db_uri, app_dir + '/../keys')
+app = create_app(db_uri, users_db_uri, app_dir + '/../keys')
 
 
 def run_development():

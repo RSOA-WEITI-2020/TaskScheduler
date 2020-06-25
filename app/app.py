@@ -4,7 +4,7 @@ from app_celery import *
 from flask_cors import CORS
 
 
-def create_app(db_uri, keys_dir_path):
+def create_app(db_uri, users_db_uri, keys_dir_path):
     app = Flask(__name__)
 
     public_key = ''
@@ -20,7 +20,13 @@ def create_app(db_uri, keys_dir_path):
     app.config['JWT_TOKEN_LOCATION'] = ('headers', 'cookies')
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+    app.config['SQLALCHEMY_BINDS'] = {
+        'users': users_db_uri
+    }
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    app.config['PROPAGATE_EXCEPTIONS'] = True
 
     from extensions import (
         api,

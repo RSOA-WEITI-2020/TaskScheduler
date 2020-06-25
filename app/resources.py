@@ -18,8 +18,7 @@ from flask_jwt_extended import (
 )
 from extensions import (
     jwt,
-    db,
-    AlchemyEncoder
+    db
 )
 
 from models import (
@@ -30,6 +29,7 @@ from models import (
 from tasks import queue_simulation
 from celery.result import AsyncResult
 from datetime import datetime
+from flask import jsonify
 
 
 class BaseResource(Resource):
@@ -98,11 +98,11 @@ class Tasks(BaseResource):
             end_str = None
             cost = None
             try:
-                start_str = task.start_time.strftime("%d-%m-%YT%H:%M:%S")
+                start_str = task.start_time.strftime("%Y-%m-%dT%H:%M:%S")
             except:
                 pass
             try:
-                end_str = task.end_time.strftime("%d-%m-%YT%H:%M:%S")
+                end_str = task.end_time.strftime("%Y-%m-%dT%H:%M:%S")
             except:
                 pass
             try:
