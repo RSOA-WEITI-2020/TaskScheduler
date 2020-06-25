@@ -18,6 +18,7 @@ celery = "^4.4.5"
 cryptography = "^2.9.2"
 rosatasks = {git = "https://github.com/RSOA-WEITI-2020/ROSATasks"}
 pymysql = "^0.9.3"
+flask-cors = "^3.0.8"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.2"

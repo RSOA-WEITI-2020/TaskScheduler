@@ -96,14 +96,17 @@ class Tasks(BaseResource):
         for task in tasks:
             start_str = None
             end_str = None
-
+            cost = None
             try:
                 start_str = task.start_time.strftime("%d-%m-%YT%H:%M:%S")
             except:
                 pass
-
             try:
                 end_str = task.end_time.strftime("%d-%m-%YT%H:%M:%S")
+            except:
+                pass
+            try:
+                cost = float(task.cost)
             except:
                 pass
 
@@ -115,7 +118,7 @@ class Tasks(BaseResource):
                         'shots': task.shots,
                         'status': task.status.name,
                         'response': task.response,
-                        'cost': task.cost
+                        'cost': cost
                         })
 
         return res
@@ -137,14 +140,17 @@ class SingleTask(BaseResource):
 
         start_str = None
         end_str = None
-
+        cost = None
         try:
             start_str = task.start_time.strftime("%d-%m-%YT%H:%M:%S")
         except:
             pass
-
         try:
             end_str = task.end_time.strftime("%d-%m-%YT%H:%M:%S")
+        except:
+            pass
+        try:
+            cost = float(task.cost)
         except:
             pass
 
@@ -156,5 +162,5 @@ class SingleTask(BaseResource):
                 'shots': task.shots,
                 'status': task.status.name,
                 'response': task.response,
-                'cost': task.cost
+                'cost': cost
                 }

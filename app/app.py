@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from app_celery import *
+from flask_cors import CORS
 
 
 def create_app(db_uri, keys_dir_path):
@@ -37,5 +38,7 @@ def create_app(db_uri, keys_dir_path):
     import resources
     resources.BaseResource.register(api)
     api.init_app(app)
+
+    CORS(app)
 
     return app
