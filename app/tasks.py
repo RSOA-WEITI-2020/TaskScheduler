@@ -39,7 +39,7 @@ class TaskThread(threading.Thread):
             time.sleep(1)
         print(self.result.result, flush=True)
 
-        task_id, err, res, schema, seconds = self.result.result
+        task_id, err, res, schema, seconds, total_seconds = self.result.result
         user_id = None
         with self.app.app_context():
             task = Task.query.filter_by(id=task_id).first()

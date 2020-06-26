@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rosa-task-scheduler"
-version = "0.2.0"
+version = "0.3.0"
 description = "Task Scheduler for ROSA system"
 authors = ["Wojciech Gruszka <wojciech@gruszka.eu>"]
 license = "MIT"
