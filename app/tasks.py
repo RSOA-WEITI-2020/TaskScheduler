@@ -58,7 +58,6 @@ class TaskThread(threading.Thread):
             task.cost = seconds * 0.10  # 10 gr per second
             user_id = task.user_id
             try:
-                db.session.add(task)
                 db.session.commit()
             except:
                 print("Cannot save results into DB")
@@ -67,12 +66,8 @@ class TaskThread(threading.Thread):
             user = User.query.filter_by(id=user_id).first()
             if user is None:
                 return
-
-        user.balance = Decimal(float(user.balance) - float(task.cost))
-
-        with self.app.app_context():
+            user.balance = Decimal(float(user.balance) - float(task.cost))
             try:
-                db.session.add(user)
                 db.session.commit()
             except:
                 print("Cannot update wallet")
