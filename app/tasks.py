@@ -55,7 +55,7 @@ class TaskThread(threading.Thread):
                 task.schema = schema
 
             task.end_time = datetime.now()
-            task.cost = seconds * 0.10  # 10 gr per second
+            task.cost = seconds * 0.10 + 0.10  # 10 gr per second
             user_id = task.user_id
             try:
                 db.session.commit()
